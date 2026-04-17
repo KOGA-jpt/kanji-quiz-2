@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>語彙カードと読みクイズ（デジタル教科書）</title>
+  <style>
+    :root{--bg:#f6f7fb;--card:#fff;--text:#1f2937;--sub:#6b7280;--accent:#2563eb;--border:#dbe3f0;--soft:#f8fbff;--ok:#15803d;--ng:#b91c1c}
+    *{box-sizing:border-box} body{margin:0;font-family:"Yu Gothic","Meiryo",sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+    .wrap{max-width:960px;margin:0 auto;padding:20px}.card{background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,.06);padding:22px;margin-bottom:18px}
+    h1,h2{margin-top:0}.sub{color:var(--sub);font-size:.98rem}.tabs,.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    button,input,select{font:inherit}.tabBtn,button{border:none;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:700}.tabBtn.active,.primary{background:var(--accent);color:#fff}.tabBtn:not(.active),.secondary{background:#e5ecf8;color:#1e3a8a}.ghost{background:#eef2f7;color:#334155}
+    .panel{display:block}.hidden{display:none !important}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.vocabGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}@media(max-width:700px){.grid,.vocabGrid{grid-template-columns:1fr}.question{font-size:2rem}}
+    label{display:block;font-weight:700;margin-bottom:6px} input,select{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:#fff}
+    .vocabItem{border:1px solid var(--border);border-radius:16px;overflow:hidden;background:#fff}.vocabHeader{width:100%;text-align:left;background:var(--soft);color:var(--text);border-radius:0;padding:16px;display:flex;justify-content:space-between;align-items:center;font-size:1.1rem}.vocabHeader span:last-child{color:var(--sub);font-size:.95rem}
+    .vocabBody{display:none;padding:16px;border-top:1px solid var(--border)}.vocabItem.open .vocabBody{display:block}.meaningBlock{margin-bottom:10px}.meaningLabel{font-weight:700;color:#1e3a8a;margin-bottom:2px}
+    .meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--sub);font-size:.95rem}.questionBox{text-align:center;padding:16px 10px;background:#f8fbff;border:1px solid #dceaff;border-radius:18px;margin:18px 0}.questionLabel{color:var(--sub);font-size:.95rem;margin-bottom:8px}.question{font-size:2.5rem;font-weight:800;letter-spacing:.06em}
+    .feedback{margin-top:14px;padding:14px;border-radius:14px;font-weight:700;display:none}.ok{background:#ecfdf3;color:var(--ok);border:1px solid #bbf7d0;display:block}.ng{background:#fef2f2;color:var(--ng);border:1px solid #fecaca;display:block}.score{font-size:1.2rem;font-weight:800;margin:6px 0 10px}.resultList{padding-left:1.2em}.muted{color:var(--sub);font-size:.92rem}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>語彙カードと読みクイズ（デジタル教科書）</h1>
+    <div class="sub">語彙をタップすると、読み方と意味が開きます。上のボタンで語彙カードと読みクイズを切り替えられます。</div>
+    <div class="tabs">
+      <button class="tabBtn active" data-target="vocabPanel">語彙を見る</button>
+      <button class="tabBtn" data-target="quizPanel">読みクイズをする</button>
+    </div>
+  </div>
+
+  <div class="panel" id="vocabPanel">
+    <div class="card">
+      <h2>語彙カード</h2>
+      <div class="sub">単語をタップすると、読み・やさしい日本語・中国語・ベトナム語・ネパール語・シンハラ語・英語が表示されます。</div>
+      <label for="searchInput">語彙検索</label>
+      <input id="searchInput" type="text" placeholder="漢字・読み・意味で検索" />
+      <div class="controls">
+        <button class="secondary" id="openAllBtn">全部ひらく</button>
+        <button class="ghost" id="closeAllBtn">全部とじる</button>
+      </div>
+      <div class="vocabGrid" id="vocabGrid"></div>
+    </div>
+  </div>
+
+  <div class="panel hidden" id="quizPanel">
+    <div class="card">
+      <h2>読みクイズ</h2>
+      <div class="grid">
+        <div><label for="studentId">学籍番号</label><input id="studentId" type="text" placeholder="例：20260001" /></div>
+        <div><label for="studentName">名前</label><input id="studentName" type="text" placeholder="例：すずき はなこ" /></div>
+      </div>
+      <div class="grid" style="margin-top:12px;">
+        <div><label for="questionCount">問題数</label><select id="questionCount"><option value="10">10問</option><option value="20">20問</option><option value="50">50問</option></select></div>
+        <div><label for="mode">出題方法</label><select id="mode"><option value="random">ランダム</option><option value="fixed">1番から順番</option></select></div>
+      </div>
+      <div class="controls"><button class="primary" id="startBtn">はじめる</button></div>
+    </div>
+
+    <div class="card hidden" id="quizCard">
+      <div class="meta"><div id="studentInfo">学籍番号：　／　名前：</div><div id="progress">第1問</div></div>
+      <div class="questionBox"><div class="questionLabel">次のことばの読みを、ひらがなで答えましょう。</div><div class="question" id="questionText">文部科学省</div></div>
+      <label for="answerInput">こたえ</label><input id="answerInput" type="text" placeholder="ひらがなで入力" autocomplete="off" />
+      <div class="muted">※ ひらがなで入力してください。</div>
+      <div class="controls"><button class="primary" id="checkBtn">答え合わせ</button><button class="secondary hidden" id="nextBtn">次の問題へ</button><button class="ghost" id="restartBtn">最初に戻る</button></div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+    <div class="card hidden" id="resultCard">
+      <h2>結果</h2>
+      <div id="resultStudent"></div>
+      <div class="score" id="scoreText"></div>
+      <div class="muted">まちがえた問題は下で確認できます。</div>
+      <ol class="resultList" id="mistakeList"></ol>
+      <div class="controls"><button class="primary" id="retryWrongBtn">まちがえた問題だけもう一度</button><button class="secondary" id="newQuizBtn">新しくやり直す</button></div>
+    </div>
+  </div>
+</div>
+<script>
+const WORDS = [
+{kanji:"文部科学省",reading:"もんぶかがくしょう",jp:"教育や文化などを担当する国の役所。",zh:"文部科学省",vi:"Bộ Giáo dục, Văn hóa, Thể thao, Khoa học và Công nghệ",ne:"शिक्षा, संस्कृति आदि हेर्ने जापानको मन्त्रालय",si:"අධ්‍යාපන හා සංස්කෘතික කටයුතු භාර ජපාන අමාත්‍යාංශය",en:"Ministry of Education, Culture, Sports, Science and Technology"},
+{kanji:"デジタル教科書",reading:"でじたるきょうかしょ",jp:"タブレットなどで見る電子の教科書。",zh:"数字教科书",vi:"sách giáo khoa số",ne:"डिजिटल पाठ्यपुस्तक",si:"ඩිජිටල් පාඩම්පොත",en:"digital textbook"},
+{kanji:"正式",reading:"せいしき",jp:"きちんと決まった、公式のこと。",zh:"正式",vi:"chính thức",ne:"औपचारिक; आधिकारिक",si:"නිල; විධිමත්",en:"official; formal"},
+{kanji:"教科書",reading:"きょうかしょ",jp:"学校で勉強するときに使う本。",zh:"教科书",vi:"sách giáo khoa",ne:"पाठ्यपुस्तक",si:"පාඩම්පොත",en:"textbook"},
+{kanji:"導入",reading:"どうにゅう",jp:"新しいものを取り入れて使い始めること。",zh:"引入",vi:"đưa vào, áp dụng",ne:"परिचय; लागू गर्नु",si:"හඳුන්වා දීම; ක්‍රියාත්මක කිරීම",en:"introduction; implementation"},
+{kanji:"適した",reading:"てきした",jp:"よく合っている。",zh:"适合的",vi:"phù hợp",ne:"उपयुक्त",si:"සුදුසු",en:"suited; appropriate"},
+{kanji:"学年",reading:"がくねん",jp:"学校での何年生かという区分。",zh:"年级",vi:"khối lớp",ne:"कक्षा स्तर",si:"ශ්‍රේණිය",en:"school grade"},
+{kanji:"教科",reading:"きょうか",jp:"国語や数学などの勉強の種類。",zh:"学科，科目",vi:"môn học",ne:"विषय",si:"විෂය",en:"subject"},
+{kanji:"定める",reading:"さだめる",jp:"決める。",zh:"规定，制定",vi:"quy định, xác định",ne:"निर्धारण गर्नु",si:"නියම කිරීම",en:"determine; establish"},
+{kanji:"指針",reading:"ししん",jp:"進め方を決めるための大事な考え。",zh:"方针，指导原则",vi:"kim chỉ nam, hướng dẫn",ne:"मार्गदर्शक सिद्धान्त",si:"මාර්ගෝපදේශය",en:"guideline"},
+{kanji:"策定",reading:"さくてい",jp:"計画や方針を作って決めること。",zh:"制定",vi:"hoạch định, xây dựng",ne:"तयार गरेर निर्धारण गर्नु",si:"සකස් කිරීම",en:"formulation"},
+{kanji:"議論",reading:"ぎろん",jp:"意見を出し合って話し合うこと。",zh:"讨论",vi:"thảo luận",ne:"बहस; छलफल",si:"සාකච්ඡාව",en:"discussion"},
+{kanji:"有識者",reading:"ゆうしきしゃ",jp:"専門的な知識を持っている人。",zh:"有识之士，专家",vi:"chuyên gia, người có hiểu biết",ne:"विशेषज्ञ; जानकार व्यक्ति",si:"විශේෂ දැනුමක් ඇති පුද්ගලයා",en:"expert; knowledgeable person"},
+{kanji:"検討会議",reading:"けんとうかいぎ",jp:"よく考えて話し合うための会議。",zh:"研讨会议",vi:"cuộc họp thảo luận, xem xét",ne:"छलफल बैठक",si:"සලකා බැලීමේ රැස්වීම",en:"review meeting; study group"},
+{kanji:"初会合",reading:"はつかいごう",jp:"最初の会合。",zh:"首次会议",vi:"cuộc họp đầu tiên",ne:"पहिलो बैठक",si:"පළමු හමුව",en:"first meeting"},
+{kanji:"認知科学",reading:"にんちかがく",jp:"人がどのように考え、理解するかを調べる学問。",zh:"认知科学",vi:"khoa học nhận thức",ne:"संज्ञान विज्ञान",si:"සංජානන විද්‍යාව",en:"cognitive science"},
+{kanji:"知見",reading:"ちけん",jp:"研究や経験から得た知識や考え。",zh:"见解，知识",vi:"tri thức, hiểu biết",ne:"ज्ञान; अन्तर्दृष्टि",si:"දැනුම; අවබෝධය",en:"knowledge; findings"},
+{kanji:"踏まえる",reading:"ふまえる",jp:"もとにして考える。",zh:"根据，基于",vi:"dựa trên",ne:"आधार मान्नु",si:"මත පදනම් වීම",en:"base on; take into account"},
+{kanji:"項目",reading:"こうもく",jp:"一つ一つの内容。",zh:"项目",vi:"mục",ne:"बुँदा; शीर्षक",si:"අයිතමය",en:"item"},
+{kanji:"論点",reading:"ろんてん",jp:"話し合うときの大切な点。",zh:"论点",vi:"luận điểm, điểm tranh luận",ne:"बहसको मुख्य बुँदा",si:"වාදයේ ප්‍රධාන කරුණ",en:"point at issue"},
+{kanji:"示す",reading:"しめす",jp:"見せる。はっきり出す。",zh:"表示，提出",vi:"chỉ ra, nêu ra",ne:"देखाउनु; जनाउनु",si:"පෙන්වීම; දැක්වීම",en:"show; indicate"},
+{kanji:"今秋",reading:"こんしゅう",jp:"今年の秋。",zh:"今秋",vi:"mùa thu năm nay",ne:"यस वर्षको शरद ऋतुमा",si:"මෙම වසරේ ශරත් සමයේ",en:"this autumn"},
+{kanji:"巡る",reading:"めぐる",jp:"ある問題について関係する。",zh:"围绕",vi:"xoay quanh",ne:"बारेमा; वरिपरि घुम्ने",si:"සම්බන්ධයෙන්; වටා",en:"surrounding; concerning"},
+{kanji:"年齢",reading:"ねんれい",jp:"何歳かということ。",zh:"年龄",vi:"tuổi",ne:"उमेर",si:"වයස",en:"age"},
+{kanji:"影響",reading:"えいきょう",jp:"何かから受ける変化や力。",zh:"影响",vi:"ảnh hưởng",ne:"प्रभाव",si:"බලපෑම",en:"influence; effect"},
+{kanji:"指摘",reading:"してき",jp:"問題や大切な点を言うこと。",zh:"指出",vi:"chỉ ra",ne:"औँल्याउनु; संकेत गर्नु",si:"පෙන්වා දීම",en:"pointing out"},
+{kanji:"委員",reading:"いいん",jp:"会や組織の仕事を担当する人。",zh:"委员",vi:"ủy viên",ne:"सदस्य; समिति सदस्य",si:"කමිටු සාමාජිකයා",en:"committee member"},
+{kanji:"教授",reading:"きょうじゅ",jp:"大学で教える先生。",zh:"教授",vi:"giáo sư",ne:"प्राध्यापक",si:"මහාචාර්ය",en:"professor"},
+{kanji:"会合",reading:"かいごう",jp:"人が集まる話し合い。",zh:"会合",vi:"cuộc họp",ne:"बैठक; भेला",si:"හමුව; රැස්වීම",en:"meeting"},
+{kanji:"機能",reading:"きのう",jp:"はたらき。役目。",zh:"功能",vi:"chức năng",ne:"कार्य; कार्यक्षमता",si:"ක්‍රියාකාරිත්වය",en:"function"},
+{kanji:"注意",reading:"ちゅうい",jp:"気をつけること。",zh:"注意",vi:"chú ý",ne:"ध्यान; सावधानी",si:"අවධානය; සැලකිල්ල",en:"attention; caution"},
+{kanji:"集中",reading:"しゅうちゅう",jp:"一つのことに気持ちを向けること。",zh:"集中",vi:"tập trung",ne:"एकाग्रता",si:"එකाग්‍රතාව",en:"concentration"},
+{kanji:"妨げ",reading:"さまたげ",jp:"じゃまになるもの。",zh:"妨碍，阻碍",vi:"sự cản trở",ne:"अवरोध; बाधा",si:"බාධාව",en:"obstacle; hindrance"},
+{kanji:"活用",reading:"かつよう",jp:"役に立つように使うこと。",zh:"活用",vi:"vận dụng, 활용",ne:"उपयोग; सदुपयोग",si:"ප්‍රයෝජනයට ගැනීම",en:"practical use; utilization"},
+{kanji:"留意点",reading:"りゅういてん",jp:"特に気をつけるべき点。",zh:"注意点",vi:"điểm cần lưu ý",ne:"ध्यान दिनुपर्ने बुँदा",si:"සැලකිලිමත් විය යුතු කරුණ",en:"point to note"},
+{kanji:"優位",reading:"ゆうい",jp:"ほかよりすぐれていること。",zh:"占优势",vi:"ưu thế",ne:"श्रेष्ठता; लाभदायक स्थिति",si:"උත්තම තත්ත්වය; වාසිදායක බව",en:"advantage; superiority"},
+{kanji:"低学年",reading:"ていがくねん",jp:"小学校などの下の学年。",zh:"低年级",vi:"khối lớp thấp",ne:"तल्लो कक्षा",si:"පහළ ශ්‍රේණි",en:"lower grades"},
+{kanji:"学習内容",reading:"がくしゅうないよう",jp:"勉強する内容。",zh:"学习内容",vi:"nội dung học tập",ne:"पढाइको सामग्री",si:"ඉගෙනීමේ අන්තර්ගතය",en:"learning content"},
+{kanji:"容易",reading:"ようい",jp:"簡単でしやすいこと。",zh:"容易",vi:"dễ dàng",ne:"सहज; सजिलो",si:"පහසු",en:"easy"},
+{kanji:"必要",reading:"ひつよう",jp:"なくてはならないこと。",zh:"必要",vi:"cần thiết",ne:"आवश्यक",si:"අවශ්‍ය",en:"necessary"},
+{kanji:"効果的",reading:"こうかてき",jp:"よい結果がしっかり出るようす。",zh:"有效的",vi:"hiệu quả",ne:"प्रभावकारी",si:"ඵලදායී",en:"effective"},
+{kanji:"視力低下",reading:"しりょくていか",jp:"目が見えにくくなること。",zh:"视力下降",vi:"suy giảm thị lực",ne:"दृष्टि कमजोर हुनु",si:"ඇස් පෙනීම අඩුවීම",en:"decline in eyesight"},
+{kanji:"教育委員会",reading:"きょういくいいんかい",jp:"地域の教育について決める役所。",zh:"教育委员会",vi:"ủy ban giáo dục",ne:"शिक्षा समिति",si:"අධ්‍යාපන මණ්ඩලය",en:"board of education"},
+{kanji:"負担軽減",reading:"ふたんけいげん",jp:"大変さや重さを少なくすること。",zh:"减轻负担",vi:"giảm gánh nặng",ne:"भार कम गर्नु",si:"බර අඩු කිරීම",en:"burden reduction"},
+{kanji:"政府",reading:"せいふ",jp:"国を動かすしくみや組織。",zh:"政府",vi:"chính phủ",ne:"सरकार",si:"රජය",en:"government"},
+{kanji:"閣議決定",reading:"かくぎけってい",jp:"大臣たちの会議で正式に決めること。",zh:"内阁会议决定",vi:"quyết định của nội các",ne:"मन्त्रिपरिषद्को निर्णय",si:"මන්ත්‍රි මණ්ඩල තීරණය",en:"cabinet decision"},
+{kanji:"学校教育法改正案",reading:"がっこうきょういくほうかいせいあん",jp:"学校教育法を変えるための案。",zh:"学校教育法修正案",vi:"dự thảo sửa đổi Luật Giáo dục Trường học",ne:"विद्यालय शिक्षा ऐन संशोधन प्रस्ताव",si:"පාසල් අධ්‍යාපන නීති සංශෝධන කෙටුම්පත",en:"bill to amend the School Education Act"},
+{kanji:"国会",reading:"こっかい",jp:"国の法律を決める場所。",zh:"国会",vi:"quốc hội",ne:"संसद",si:"පාර්ලිමේන්තුව",en:"National Diet; parliament"},
+{kanji:"ハイブリッド",reading:"はいぶりっど",jp:"二つ以上を組み合わせた形。",zh:"混合型，混合",vi:"lai, kết hợp",ne:"मिश्रित रूप",si:"මිශ්‍ර ආකාරය",en:"hybrid"},
+{kanji:"順次",reading:"じゅんじ",jp:"順番に少しずつ進めること。",zh:"依次，陆续",vi:"lần lượt, theo thứ tự",ne:"क्रमशः",si:"क्रमයෙන්",en:"sequentially; gradually"}
+];
+
+const tabBtns=document.querySelectorAll('.tabBtn'); const panels=document.querySelectorAll('.panel');
+tabBtns.forEach(btn=>btn.addEventListener('click',()=>{tabBtns.forEach(b=>b.classList.remove('active'));btn.classList.add('active');panels.forEach(p=>p.classList.add('hidden'));const target=document.getElementById(btn.dataset.target);target.classList.remove('hidden');target.scrollIntoView({behavior:'smooth',block:'start'});}));
+
+const vocabGrid=document.getElementById('vocabGrid');
+function renderVocab(list){vocabGrid.innerHTML=''; list.forEach((w,i)=>{const div=document.createElement('div'); div.className='vocabItem'; div.innerHTML=`<button class="vocabHeader" type="button"><span>${i+1}. ${w.kanji}</span><span>タップでひらく</span></button><div class="vocabBody"><div class="meaningBlock"><div class="meaningLabel">読み</div><div>${w.reading}</div></div><div class="meaningBlock"><div class="meaningLabel">やさしい日本語</div><div>${w.jp}</div></div><div class="meaningBlock"><div class="meaningLabel">中国語</div><div>${w.zh}</div></div><div class="meaningBlock"><div class="meaningLabel">ベトナム語</div><div>${w.vi}</div></div><div class="meaningBlock"><div class="meaningLabel">ネパール語</div><div>${w.ne}</div></div><div class="meaningBlock"><div class="meaningLabel">シンハラ語</div><div>${w.si}</div></div><div class="meaningBlock"><div class="meaningLabel">英語</div><div>${w.en}</div></div></div>`; div.querySelector('.vocabHeader').addEventListener('click',()=>div.classList.toggle('open')); vocabGrid.appendChild(div);});}
+renderVocab(WORDS);
+document.getElementById('searchInput').addEventListener('input',e=>{const q=e.target.value.trim().toLowerCase(); const filtered=WORDS.filter(w=>Object.values(w).some(v=>String(v).toLowerCase().includes(q))); renderVocab(filtered);});
+document.getElementById('openAllBtn').addEventListener('click',()=>document.querySelectorAll('.vocabItem').forEach(x=>x.classList.add('open')));
+document.getElementById('closeAllBtn').addEventListener('click',()=>document.querySelectorAll('.vocabItem').forEach(x=>x.classList.remove('open')));
+
+const startBtn=document.getElementById('startBtn'),quizCard=document.getElementById('quizCard'),resultCard=document.getElementById('resultCard'),questionText=document.getElementById('questionText'),progress=document.getElementById('progress'),answerInput=document.getElementById('answerInput'),checkBtn=document.getElementById('checkBtn'),nextBtn=document.getElementById('nextBtn'),restartBtn=document.getElementById('restartBtn'),feedback=document.getElementById('feedback'),studentInfo=document.getElementById('studentInfo'),resultStudent=document.getElementById('resultStudent'),scoreText=document.getElementById('scoreText'),mistakeList=document.getElementById('mistakeList'),retryWrongBtn=document.getElementById('retryWrongBtn'),newQuizBtn=document.getElementById('newQuizBtn');
+let quizItems=[],currentIndex=0,score=0,checked=false,mistakes=[];
+function shuffle(a){const c=[...a];for(let i=c.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[c[i],c[j]]=[c[j],c[i]]}return c}
+function normalize(t){return (t||'').trim().replace(/\s+/g,'')}
+function buildQuiz(items){quizItems=items;currentIndex=0;score=0;checked=false;mistakes=[];resultCard.classList.add('hidden');quizCard.classList.remove('hidden');renderQuestion();answerInput.focus()}
+function startQuizFromSettings(){const sid=document.getElementById('studentId').value.trim(),sname=document.getElementById('studentName').value.trim(),count=Number(document.getElementById('questionCount').value),mode=document.getElementById('mode').value;studentInfo.textContent=`学籍番号：${sid||'未入力'}　／　名前：${sname||'未入力'}`;resultStudent.textContent=studentInfo.textContent;let items=mode==='random'?shuffle(WORDS):[...WORDS];buildQuiz(items.slice(0,count))}
+function renderQuestion(){const item=quizItems[currentIndex];questionText.textContent=item.kanji;progress.textContent=`第${currentIndex+1}問 / ${quizItems.length}`;answerInput.value='';checked=false;feedback.className='feedback';feedback.textContent='';nextBtn.classList.add('hidden');checkBtn.disabled=false}
+function checkAnswer(){if(checked)return;const item=quizItems[currentIndex],user=normalize(answerInput.value),correct=normalize(item.reading);if(!user){feedback.className='feedback ng';feedback.textContent='こたえを入力してください。';return}checked=true;checkBtn.disabled=true;nextBtn.classList.remove('hidden');if(user===correct){score++;feedback.className='feedback ok';feedback.textContent=`〇 正解です！「${item.kanji}」は「${item.reading}」です。`}else{mistakes.push(item);feedback.className='feedback ng';feedback.textContent=`× ちがいます。正解は「${item.reading}」です。`}}
+function nextQuestion(){if(!checked)return;currentIndex++;if(currentIndex>=quizItems.length){showResults();return}renderQuestion();answerInput.focus()}
+function showResults(){quizCard.classList.add('hidden');resultCard.classList.remove('hidden');scoreText.textContent=`${quizItems.length}問中 ${score}問正解`;mistakeList.innerHTML='';if(mistakes.length===0){const li=document.createElement('li');li.textContent='全問正解です。すばらしいです。';mistakeList.appendChild(li);retryWrongBtn.disabled=true}else{retryWrongBtn.disabled=false;mistakes.forEach(item=>{const li=document.createElement('li');li.textContent=`${item.kanji} → ${item.reading}`;mistakeList.appendChild(li)})}}
+startBtn.addEventListener('click',startQuizFromSettings);checkBtn.addEventListener('click',checkAnswer);nextBtn.addEventListener('click',nextQuestion);restartBtn.addEventListener('click',()=>{quizCard.classList.add('hidden');resultCard.classList.add('hidden');window.scrollTo({top:0,behavior:'smooth'})});retryWrongBtn.addEventListener('click',()=>{if(mistakes.length>0)buildQuiz(shuffle(mistakes))});newQuizBtn.addEventListener('click',()=>{resultCard.classList.add('hidden');window.scrollTo({top:0,behavior:'smooth'})});answerInput.addEventListener('keydown',e=>{if(e.key==='Enter'){if(!checked)checkAnswer();else nextQuestion();}});
+</script>
+</body>
+</html>
