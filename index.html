@@ -12,6 +12,7 @@
     button,input,select{font:inherit}.tabBtn,button{border:none;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:700}.tabBtn.active,.primary{background:var(--accent);color:#fff}.tabBtn:not(.active),.secondary{background:#e5ecf8;color:#1e3a8a}.ghost{background:#eef2f7;color:#334155}
     .panel{display:block}.hidden{display:none !important}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.vocabGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}@media(max-width:700px){.grid,.vocabGrid{grid-template-columns:1fr}.question{font-size:2rem}}
     label{display:block;font-weight:700;margin-bottom:6px} input,select{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:#fff}
+    .languageBox{margin-top:14px;margin-bottom:16px;max-width:460px;padding:15px 16px;background:#eef6ff;border:2px solid #b9d7ff;border-radius:14px}.languageBoxTitle{font-weight:800;color:#1e3a8a;font-size:1.05rem;margin-bottom:2px}.languageBoxText{color:#475569;font-size:.94rem;margin-bottom:10px}.languageBox select{border:1.5px solid #8fbdf5;background:#fff}.languageBox .muted{margin-top:6px}
     .vocabItem{border:1px solid var(--border);border-radius:16px;overflow:hidden;background:#fff}.vocabHeader{width:100%;text-align:left;background:var(--soft);color:var(--text);border-radius:0;padding:16px;display:flex;justify-content:space-between;align-items:center;font-size:1.1rem}.vocabHeader span:last-child{color:var(--sub);font-size:.95rem}
     .vocabBody{display:none;padding:16px;border-top:1px solid var(--border)}.vocabItem.open .vocabBody{display:block}.meaningBlock{margin-bottom:10px}.meaningLabel{font-weight:700;color:#1e3a8a;margin-bottom:2px}
     .meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--sub);font-size:.95rem}.questionBox{text-align:center;padding:16px 10px;background:#f8fbff;border:1px solid #dceaff;border-radius:18px;margin:18px 0}.questionLabel{color:var(--sub);font-size:.95rem;margin-bottom:8px}.question{font-size:2.5rem;font-weight:800;letter-spacing:.06em}
@@ -32,7 +33,23 @@
   <div class="panel" id="vocabPanel">
     <div class="card">
       <h2>語彙カード</h2>
-      <div class="sub">単語をタップすると、読み・やさしい日本語・中国語・ベトナム語・ネパール語・シンハラ語・英語が表示されます。</div>
+      <div class="sub">単語をタップすると、読み・やさしい日本語・選んだ言語の意味が表示されます。</div>
+      <div class="languageBox">
+        <div class="languageBoxTitle">翻訳する言語を選んでください</div>
+        <div class="languageBoxText">自分が使いたい言語を選ぶと、その言語の意味が表示されます。</div>
+        <label for="languageSelect">翻訳言語</label>
+        <select id="languageSelect">
+          <option value="zh">中文（中国語）</option>
+          <option value="vi">Tiếng Việt（ベトナム語）</option>
+          <option value="ne">नेपाली（ネパール語）</option>
+          <option value="si">සිංහල（シンハラ語）</option>
+          <option value="my">မြန်မာဘာသာ（ミャンマー語）</option>
+          <option value="mn">Монгол（モンゴル語）</option>
+          <option value="en">English（英語）</option>
+          <option value="all">すべて表示</option>
+        </select>
+        <div class="muted">※ 選んだ言語はこの端末に保存されます。</div>
+      </div>
       <label for="searchInput">語彙検索</label>
       <input id="searchInput" type="text" placeholder="漢字・読み・意味で検索" />
       <div class="controls">
@@ -79,65 +96,115 @@
 </div>
 <script>
 const WORDS = [
-{kanji:"文部科学省",reading:"もんぶかがくしょう",jp:"教育や文化などを担当する国の役所。",zh:"文部科学省",vi:"Bộ Giáo dục, Văn hóa, Thể thao, Khoa học và Công nghệ",ne:"शिक्षा, संस्कृति आदि हेर्ने जापानको मन्त्रालय",si:"අධ්‍යාපන හා සංස්කෘතික කටයුතු භාර ජපාන අමාත්‍යාංශය",en:"Ministry of Education, Culture, Sports, Science and Technology"},
-{kanji:"デジタル教科書",reading:"でじたるきょうかしょ",jp:"タブレットなどで見る電子の教科書。",zh:"数字教科书",vi:"sách giáo khoa số",ne:"डिजिटल पाठ्यपुस्तक",si:"ඩිජිටල් පාඩම්පොත",en:"digital textbook"},
-{kanji:"正式",reading:"せいしき",jp:"きちんと決まった、公式のこと。",zh:"正式",vi:"chính thức",ne:"औपचारिक; आधिकारिक",si:"නිල; විධිමත්",en:"official; formal"},
-{kanji:"導入",reading:"どうにゅう",jp:"新しいものを取り入れて使い始めること。",zh:"引入",vi:"đưa vào, áp dụng",ne:"परिचय; लागू गर्नु",si:"හඳුන්වා දීම; ක්‍රියාත්මක කිරීම",en:"introduction; implementation"},
-{kanji:"適した",reading:"てきした",jp:"よく合っている。",zh:"适合的",vi:"phù hợp",ne:"उपयुक्त",si:"සුදුසු",en:"suited; appropriate"},
-{kanji:"学年",reading:"がくねん",jp:"学校での何年生かという区分。",zh:"年级",vi:"khối lớp",ne:"कक्षा स्तर",si:"ශ්‍රේණිය",en:"school grade"},
-{kanji:"教科",reading:"きょうか",jp:"国語や数学などの勉強の種類。",zh:"学科，科目",vi:"môn học",ne:"विषय",si:"විෂය",en:"subject"},
-{kanji:"定める",reading:"さだめる",jp:"決める。",zh:"规定，制定",vi:"quy định, xác định",ne:"निर्धारण गर्नु",si:"නියම කිරීම",en:"determine; establish"},
-{kanji:"指針",reading:"ししん",jp:"進め方を決めるための大事な考え。",zh:"方针，指导原则",vi:"kim chỉ nam, hướng dẫn",ne:"मार्गदर्शक सिद्धान्त",si:"මාර්ගෝපදේශය",en:"guideline"},
-{kanji:"策定",reading:"さくてい",jp:"計画や方針を作って決めること。",zh:"制定",vi:"hoạch định, xây dựng",ne:"तयार गरेर निर्धारण गर्नु",si:"සකස් කිරීම",en:"formulation"},
-{kanji:"議論",reading:"ぎろん",jp:"意見を出し合って話し合うこと。",zh:"讨论",vi:"thảo luận",ne:"बहस; छलफल",si:"සාකච්ඡාව",en:"discussion"},
-{kanji:"有識者",reading:"ゆうしきしゃ",jp:"専門的な知識を持っている人。",zh:"有识之士，专家",vi:"chuyên gia, người có hiểu biết",ne:"विशेषज्ञ; जानकार व्यक्ति",si:"විශේෂ දැනුමක් ඇති පුද්ගලයා",en:"expert; knowledgeable person"},
-{kanji:"検討会議",reading:"けんとうかいぎ",jp:"よく考えて話し合うための会議。",zh:"研讨会议",vi:"cuộc họp thảo luận, xem xét",ne:"छलफल बैठक",si:"සලකා බැලීමේ රැස්වීම",en:"review meeting; study group"},
-{kanji:"初会合",reading:"はつかいごう",jp:"最初の会合。",zh:"首次会议",vi:"cuộc họp đầu tiên",ne:"पहिलो बैठक",si:"පළමු හමුව",en:"first meeting"},
-{kanji:"認知科学",reading:"にんちかがく",jp:"人がどのように考え、理解するかを調べる学問。",zh:"认知科学",vi:"khoa học nhận thức",ne:"संज्ञान विज्ञान",si:"සංජානන විද්‍යාව",en:"cognitive science"},
-{kanji:"知見",reading:"ちけん",jp:"研究や経験から得た知識や考え。",zh:"见解，知识",vi:"tri thức, hiểu biết",ne:"ज्ञान; अन्तर्दृष्टि",si:"දැනුම; අවබෝධය",en:"knowledge; findings"},
-{kanji:"踏まえる",reading:"ふまえる",jp:"もとにして考える。",zh:"根据，基于",vi:"dựa trên",ne:"आधार मान्नु",si:"මත පදනම් වීම",en:"base on; take into account"},
-{kanji:"項目",reading:"こうもく",jp:"一つ一つの内容。",zh:"项目",vi:"mục",ne:"बुँदा; शीर्षक",si:"අයිතමය",en:"item"},
-{kanji:"論点",reading:"ろんてん",jp:"話し合うときの大切な点。",zh:"论点",vi:"luận điểm, điểm tranh luận",ne:"बहसको मुख्य बुँदा",si:"වාදයේ ප්‍රධාන කරුණ",en:"point at issue"},
-{kanji:"示す",reading:"しめす",jp:"見せる。はっきり出す。",zh:"表示，提出",vi:"chỉ ra, nêu ra",ne:"देखाउनु; जनाउनु",si:"පෙන්වීම; දැක්වීම",en:"show; indicate"},
-{kanji:"今秋",reading:"こんしゅう",jp:"今年の秋。",zh:"今秋",vi:"mùa thu năm nay",ne:"यस वर्षको शरद ऋतुमा",si:"මෙම වසරේ ශරත් සමයේ",en:"this autumn"},
-{kanji:"巡る",reading:"めぐる",jp:"ある問題について関係する。",zh:"围绕",vi:"xoay quanh",ne:"बारेमा; वरिपरि घुम्ने",si:"සම්බන්ධයෙන්; වටා",en:"surrounding; concerning"},
-{kanji:"年齢",reading:"ねんれい",jp:"何歳かということ。",zh:"年龄",vi:"tuổi",ne:"उमेर",si:"වයස",en:"age"},
-{kanji:"影響",reading:"えいきょう",jp:"何かから受ける変化や力。",zh:"影响",vi:"ảnh hưởng",ne:"प्रभाव",si:"බලපෑම",en:"influence; effect"},
-{kanji:"指摘",reading:"してき",jp:"問題や大切な点を言うこと。",zh:"指出",vi:"chỉ ra",ne:"औँल्याउनु; संकेत गर्नु",si:"පෙන්වා දීම",en:"pointing out"},
-{kanji:"委員",reading:"いいん",jp:"会や組織の仕事を担当する人。",zh:"委员",vi:"ủy viên",ne:"सदस्य; समिति सदस्य",si:"කමිටු සාමාජිකයා",en:"committee member"},
-{kanji:"教授",reading:"きょうじゅ",jp:"大学で教える先生。",zh:"教授",vi:"giáo sư",ne:"प्राध्यापक",si:"මහාචාර්ය",en:"professor"},
-{kanji:"会合",reading:"かいごう",jp:"人が集まる話し合い。",zh:"会合",vi:"cuộc họp",ne:"बैठक; भेला",si:"හමුව; රැස්වීම",en:"meeting"},
-{kanji:"機能",reading:"きのう",jp:"はたらき。役目。",zh:"功能",vi:"chức năng",ne:"कार्य; कार्यक्षमता",si:"ක්‍රියාකාරිත්වය",en:"function"},
-{kanji:"注意",reading:"ちゅうい",jp:"気をつけること。",zh:"注意",vi:"chú ý",ne:"ध्यान; सावधानी",si:"අවධානය; සැලකිල්ල",en:"attention; caution"},
-{kanji:"集中",reading:"しゅうちゅう",jp:"一つのことに気持ちを向けること。",zh:"集中",vi:"tập trung",ne:"एकाग्रता",si:"එකाग්‍රතාව",en:"concentration"},
-{kanji:"妨げ",reading:"さまたげ",jp:"じゃまになるもの。",zh:"妨碍，阻碍",vi:"sự cản trở",ne:"अवरोध; बाधा",si:"බාධාව",en:"obstacle; hindrance"},
-{kanji:"活用",reading:"かつよう",jp:"役に立つように使うこと。",zh:"活用",vi:"vận dụng, 활용",ne:"उपयोग; सदुपयोग",si:"ප්‍රයෝජනයට ගැනීම",en:"practical use; utilization"},
-{kanji:"留意点",reading:"りゅういてん",jp:"特に気をつけるべき点。",zh:"注意点",vi:"điểm cần lưu ý",ne:"ध्यान दिनुपर्ने बुँदा",si:"සැලකිලිමත් විය යුතු කරුණ",en:"point to note"},
-{kanji:"紙",reading:"かみ",jp:"本やノートなどに使う材料。",zh:"纸",vi:"giấy",ne:"कागज",si:"කඩදාසි",en:"paper"},
-{kanji:"優位",reading:"ゆうい",jp:"ほかよりすぐれていること。",zh:"占优势",vi:"ưu thế",ne:"श्रेष्ठता; लाभदायक स्थिति",si:"උත්තම තත්ත්වය; වාසිදායක බව",en:"advantage; superiority"},
-{kanji:"低学年",reading:"ていがくねん",jp:"小学校などの下の学年。",zh:"低年级",vi:"khối lớp thấp",ne:"तल्लो कक्षा",si:"පහළ ශ්‍රේණි",en:"lower grades"},
-{kanji:"学習内容",reading:"がくしゅうないよう",jp:"勉強する内容。",zh:"学习内容",vi:"nội dung học tập",ne:"पढाइको सामग्री",si:"ඉගෙනීමේ අන්තර්ගතය",en:"learning content"},
-{kanji:"容易",reading:"ようい",jp:"簡単でしやすいこと。",zh:"容易",vi:"dễ dàng",ne:"सहज; सजिलो",si:"පහසු",en:"easy"},
-{kanji:"必要",reading:"ひつよう",jp:"なくてはならないこと。",zh:"必要",vi:"cần thiết",ne:"आवश्यक",si:"අවශ්‍ය",en:"necessary"},
-{kanji:"効果的",reading:"こうかてき",jp:"よい結果がしっかり出るようす。",zh:"有效的",vi:"hiệu quả",ne:"प्रभावकारी",si:"ඵලදායී",en:"effective"},
-{kanji:"視力低下",reading:"しりょくていか",jp:"目が見えにくくなること。",zh:"视力下降",vi:"suy giảm thị lực",ne:"दृष्टि कमजोर हुनु",si:"ඇස් පෙනීම අඩුවීම",en:"decline in eyesight"},
-{kanji:"教育委員会",reading:"きょういくいいんかい",jp:"地域の教育について決める役所。",zh:"教育委员会",vi:"ủy ban giáo dục",ne:"शिक्षा समिति",si:"අධ්‍යාපන මණ්ඩලය",en:"board of education"},
-{kanji:"負担軽減",reading:"ふたんけいげん",jp:"大変さや重さを少なくすること。",zh:"减轻负担",vi:"giảm gánh nặng",ne:"भार कम गर्नु",si:"බර අඩු කිරීම",en:"burden reduction"},
-{kanji:"政府",reading:"せいふ",jp:"国を動かすしくみや組織。",zh:"政府",vi:"chính phủ",ne:"सरकार",si:"රජය",en:"government"},
-{kanji:"閣議決定",reading:"かくぎけってい",jp:"大臣たちの会議で正式に決めること。",zh:"内阁会议决定",vi:"quyết định của nội các",ne:"मन्त्रिपरिषद्को निर्णय",si:"මන්ත්‍රි මණ්ඩල තීරණය",en:"cabinet decision"},
-{kanji:"学校教育法改正案",reading:"がっこうきょういくほうかいせいあん",jp:"学校教育法を変えるための案。",zh:"学校教育法修正案",vi:"dự thảo sửa đổi Luật Giáo dục Trường học",ne:"विद्यालय शिक्षा ऐन संशोधन प्रस्ताव",si:"පාසල් අධ්‍යාපන නීති සංශෝධන කෙටුම්පත",en:"bill to amend the School Education Act"},
-{kanji:"国会",reading:"こっかい",jp:"国の法律を決める場所。",zh:"国会",vi:"quốc hội",ne:"संसद",si:"පාර්ලිමේන්තුව",en:"National Diet; parliament"},
-{kanji:"ハイブリッド",reading:"はいぶりっど",jp:"二つ以上を組み合わせた形。",zh:"混合型，混合",vi:"lai, kết hợp",ne:"मिश्रित रूप",si:"මිශ්‍ර ආකාරය",en:"hybrid"},
-{kanji:"順次",reading:"じゅんじ",jp:"順番に少しずつ進めること。",zh:"依次，陆续",vi:"lần lượt, theo thứ tự",ne:"क्रमशः",si:"क्रमයෙන්",en:"sequentially; gradually"}
+{kanji:"文部科学省",reading:"もんぶかがくしょう",jp:"教育や文化などを担当する国の役所。",zh:"文部科学省",vi:"Bộ Giáo dục, Văn hóa, Thể thao, Khoa học và Công nghệ",ne:"शिक्षा, संस्कृति आदि हेर्ने जापानको मन्त्रालय",si:"අධ්‍යාපන හා සංස්කෘතික කටයුතු භාර ජපාන අමාත්‍යාංශය",en:"Ministry of Education, Culture, Sports, Science and Technology",my:"ဂျပန် ပညာရေး၊ ယဉ်ကျေးမှု၊ အားကစား၊ သိပ္ပံနှင့် နည်းပညာ ဝန်ကြီးဌာန",mn:"Японы Боловсрол, соёл, спорт, шинжлэх ухаан, технологийн яам"},
+{kanji:"デジタル教科書",reading:"でじたるきょうかしょ",jp:"タブレットなどで見る電子の教科書。",zh:"数字教科书",vi:"sách giáo khoa số",ne:"डिजिटल पाठ्यपुस्तक",si:"ඩිජිටල් පාඩම්පොත",en:"digital textbook",my:"ဒစ်ဂျစ်တယ် ပြဋ္ဌာန်းစာအုပ်",mn:"цахим сурах бичиг"},
+{kanji:"正式",reading:"せいしき",jp:"きちんと決まった、公式のこと。",zh:"正式",vi:"chính thức",ne:"औपचारिक; आधिकारिक",si:"නිල; විධිමත්",en:"official; formal",my:"တရားဝင်; စနစ်တကျ",mn:"албан ёсны"},
+{kanji:"導入",reading:"どうにゅう",jp:"新しいものを取り入れて使い始めること。",zh:"引入",vi:"đưa vào, áp dụng",ne:"परिचय; लागू गर्नु",si:"හඳුන්වා දීම; ක්‍රියාත්මක කිරීම",en:"introduction; implementation",my:"စတင်အသုံးပြုခြင်း; မိတ်ဆက်ခြင်း",mn:"нэвтрүүлэх"},
+{kanji:"適した",reading:"てきした",jp:"よく合っている。",zh:"适合的",vi:"phù hợp",ne:"उपयुक्त",si:"සුදුසු",en:"suited; appropriate",my:"သင့်လျော်သော",mn:"тохиромжтой"},
+{kanji:"学年",reading:"がくねん",jp:"学校での何年生かという区分。",zh:"年级",vi:"khối lớp",ne:"कक्षा स्तर",si:"ශ්‍රේණිය",en:"school grade",my:"အတန်းအဆင့်",mn:"анги, түвшин"},
+{kanji:"教科",reading:"きょうか",jp:"国語や数学などの勉強の種類。",zh:"学科，科目",vi:"môn học",ne:"विषय",si:"විෂය",en:"subject",my:"ဘာသာရပ်",mn:"хичээл"},
+{kanji:"定める",reading:"さだめる",jp:"決める。",zh:"规定，制定",vi:"quy định, xác định",ne:"निर्धारण गर्नु",si:"නියම කිරීම",en:"determine; establish",my:"သတ်မှတ်သည်",mn:"тогтоох"},
+{kanji:"指針",reading:"ししん",jp:"進め方を決めるための大事な考え。",zh:"方针，指导原则",vi:"kim chỉ nam, hướng dẫn",ne:"मार्गदर्शक सिद्धान्त",si:"මාර්ගෝපදේශය",en:"guideline",my:"လမ်းညွှန်ချက်",mn:"удирдамж"},
+{kanji:"策定",reading:"さくてい",jp:"計画や方針を作って決めること。",zh:"制定",vi:"hoạch định, xây dựng",ne:"तयार गरेर निर्धारण गर्नु",si:"සකස් කිරීම",en:"formulation",my:"အစီအစဉ် သို့မဟုတ် မူဝါဒ ရေးဆွဲသတ်မှတ်ခြင်း",mn:"боловсруулан батлах"},
+{kanji:"議論",reading:"ぎろん",jp:"意見を出し合って話し合うこと。",zh:"讨论",vi:"thảo luận",ne:"बहस; छलफल",si:"සාකච්ඡාව",en:"discussion",my:"ဆွေးနွေးမှု",mn:"хэлэлцүүлэг"},
+{kanji:"有識者",reading:"ゆうしきしゃ",jp:"専門的な知識を持っている人。",zh:"有识之士，专家",vi:"chuyên gia, người có hiểu biết",ne:"विशेषज्ञ; जानकार व्यक्ति",si:"විශේෂ දැනුමක් ඇති පුද්ගලයා",en:"expert; knowledgeable person",my:"ကျွမ်းကျင်ပညာရှင်",mn:"мэргэжилтэн, мэдлэгтэй хүн"},
+{kanji:"検討会議",reading:"けんとうかいぎ",jp:"よく考えて話し合うための会議。",zh:"研讨会议",vi:"cuộc họp thảo luận, xem xét",ne:"छलफल बैठक",si:"සලකා බැලීමේ රැස්වීම",en:"review meeting; study group",my:"သုံးသပ်ဆွေးနွေးရေး အစည်းအဝေး",mn:"хэлэлцэх хурал"},
+{kanji:"初会合",reading:"はつかいごう",jp:"最初の会合。",zh:"首次会议",vi:"cuộc họp đầu tiên",ne:"पहिलो बैठक",si:"පළමු හමුව",en:"first meeting",my:"ပထမဆုံး အစည်းအဝေး",mn:"анхны уулзалт"},
+{kanji:"認知科学",reading:"にんちかがく",jp:"人がどのように考え、理解するかを調べる学問。",zh:"认知科学",vi:"khoa học nhận thức",ne:"संज्ञान विज्ञान",si:"සංජානන විද්‍යාව",en:"cognitive science",my:"သိမြင်မှုဆိုင်ရာ သိပ္ပံ",mn:"танин мэдэхүйн шинжлэх ухаан"},
+{kanji:"知見",reading:"ちけん",jp:"研究や経験から得た知識や考え。",zh:"见解，知识",vi:"tri thức, hiểu biết",ne:"ज्ञान; अन्तर्दृष्टि",si:"දැනුම; අවබෝධය",en:"knowledge; findings",my:"သုတေသနမှ ရရှိသော အသိပညာ",mn:"судалгаанаас олсон мэдлэг, дүгнэлт"},
+{kanji:"踏まえる",reading:"ふまえる",jp:"もとにして考える。",zh:"根据，基于",vi:"dựa trên",ne:"आधार मान्नु",si:"මත පදනම් වීම",en:"base on; take into account",my:"အခြေခံ၍ စဉ်းစားသည်; ထည့်သွင်းစဉ်းစားသည်",mn:"үндэслэх; харгалзан үзэх"},
+{kanji:"項目",reading:"こうもく",jp:"一つ一つの内容。",zh:"项目",vi:"mục",ne:"बुँदा; शीर्षक",si:"අයිතමය",en:"item",my:"အချက်; အကြောင်းအရာ",mn:"зүйл, заалт"},
+{kanji:"論点",reading:"ろんてん",jp:"話し合うときの大切な点。",zh:"论点",vi:"luận điểm, điểm tranh luận",ne:"बहसको मुख्य बुँदा",si:"වාදයේ ප්‍රධාන කරුණ",en:"point at issue",my:"ဆွေးနွေးရမည့် အဓိကအချက်",mn:"хэлэлцэх гол асуудал"},
+{kanji:"示す",reading:"しめす",jp:"見せる。はっきり出す。",zh:"表示，提出",vi:"chỉ ra, nêu ra",ne:"देखाउनु; जनाउनु",si:"පෙන්වීම; දැක්වීම",en:"show; indicate",my:"ဖော်ပြသည်; ပြသသည်",mn:"харуулах; илэрхийлэх"},
+{kanji:"今秋",reading:"こんしゅう",jp:"今年の秋。",zh:"今秋",vi:"mùa thu năm nay",ne:"यस वर्षको शरद ऋतुमा",si:"මෙම වසරේ ශරත් සමයේ",en:"this autumn",my:"ယခုနှစ် ဆောင်းဦးရာသီ",mn:"энэ намар"},
+{kanji:"巡る",reading:"めぐる",jp:"ある問題について関係する。",zh:"围绕",vi:"xoay quanh",ne:"बारेमा; वरिपरि घुम्ने",si:"සම්බන්ධයෙන්; වටා",en:"surrounding; concerning",my:"နှင့်ပတ်သက်၍; ဝန်းကျင်တွင်",mn:"тойрсон; холбоотой"},
+{kanji:"年齢",reading:"ねんれい",jp:"何歳かということ。",zh:"年龄",vi:"tuổi",ne:"उमेर",si:"වයස",en:"age",my:"အသက်အရွယ်",mn:"нас"},
+{kanji:"影響",reading:"えいきょう",jp:"何かから受ける変化や力。",zh:"影响",vi:"ảnh hưởng",ne:"प्रभाव",si:"බලපෑම",en:"influence; effect",my:"သက်ရောက်မှု",mn:"нөлөө"},
+{kanji:"指摘",reading:"してき",jp:"問題や大切な点を言うこと。",zh:"指出",vi:"chỉ ra",ne:"औँल्याउनु; संकेत गर्नु",si:"පෙන්වා දීම",en:"pointing out",my:"ထောက်ပြခြင်း",mn:"зааж тэмдэглэх"},
+{kanji:"委員",reading:"いいん",jp:"会や組織の仕事を担当する人。",zh:"委员",vi:"ủy viên",ne:"सदस्य; समिति सदस्य",si:"කමිටු සාමාජිකයා",en:"committee member",my:"ကော်မတီအဖွဲ့ဝင်",mn:"хорооны гишүүн"},
+{kanji:"教授",reading:"きょうじゅ",jp:"大学で教える先生。",zh:"教授",vi:"giáo sư",ne:"प्राध्यापक",si:"මහාචාර්ය",en:"professor",my:"ပါမောက္ခ",mn:"профессор"},
+{kanji:"会合",reading:"かいごう",jp:"人が集まる話し合い。",zh:"会合",vi:"cuộc họp",ne:"बैठक; भेला",si:"හමුව; රැස්වීම",en:"meeting",my:"အစည်းအဝေး; တွေ့ဆုံမှု",mn:"уулзалт, хурал"},
+{kanji:"機能",reading:"きのう",jp:"はたらき。役目。",zh:"功能",vi:"chức năng",ne:"कार्य; कार्यक्षमता",si:"ක්‍රියාකාරිත්වය",en:"function",my:"လုပ်ဆောင်ချက်; စွမ်းဆောင်ရည်",mn:"үйл ажиллагаа; үүрэг"},
+{kanji:"注意",reading:"ちゅうい",jp:"気をつけること。",zh:"注意",vi:"chú ý",ne:"ध्यान; सावधानी",si:"අවධානය; සැලකිල්ල",en:"attention; caution",my:"သတိပြုခြင်း; ဂရုစိုက်ခြင်း",mn:"анхаарал; болгоомж"},
+{kanji:"集中",reading:"しゅうちゅう",jp:"一つのことに気持ちを向けること。",zh:"集中",vi:"tập trung",ne:"एकाग्रता",si:"එකाग්‍රතාව",en:"concentration",my:"အာရုံစူးစိုက်ခြင်း",mn:"төвлөрөл"},
+{kanji:"妨げ",reading:"さまたげ",jp:"じゃまになるもの。",zh:"妨碍，阻碍",vi:"sự cản trở",ne:"अवरोध; बाधा",si:"බාධාව",en:"obstacle; hindrance",my:"အနှောင့်အယှက်; အတားအဆီး",mn:"саад тотгор"},
+{kanji:"活用",reading:"かつよう",jp:"役に立つように使うこと。",zh:"活用",vi:"vận dụng, 활용",ne:"उपयोग; सदुपयोग",si:"ප්‍රයෝජනයට ගැනීම",en:"practical use; utilization",my:"အကျိုးရှိစွာ အသုံးချခြင်း",mn:"үр дүнтэй ашиглах"},
+{kanji:"留意点",reading:"りゅういてん",jp:"特に気をつけるべき点。",zh:"注意点",vi:"điểm cần lưu ý",ne:"ध्यान दिनुपर्ने बुँदा",si:"සැලකිලිමත් විය යුතු කරුණ",en:"point to note",my:"သတိထားရမည့် အချက်",mn:"анхаарах зүйл"},
+{kanji:"紙",reading:"かみ",jp:"本やノートなどに使う材料。",zh:"纸",vi:"giấy",ne:"कागज",si:"කඩදාසි",en:"paper",my:"စက္ကူ",mn:"цаас"},
+{kanji:"優位",reading:"ゆうい",jp:"ほかよりすぐれていること。",zh:"占优势",vi:"ưu thế",ne:"श्रेष्ठता; लाभदायक स्थिति",si:"උත්තම තත්ත්වය; වාසිදායක බව",en:"advantage; superiority",my:"သာလွန်မှု; အသာစီးရမှု",mn:"давуу тал"},
+{kanji:"低学年",reading:"ていがくねん",jp:"小学校などの下の学年。",zh:"低年级",vi:"khối lớp thấp",ne:"तल्लो कक्षा",si:"පහළ ශ්‍රේණි",en:"lower grades",my:"အတန်းငယ်များ; အောက်တန်းများ",mn:"бага ангиуд"},
+{kanji:"学習内容",reading:"がくしゅうないよう",jp:"勉強する内容。",zh:"学习内容",vi:"nội dung học tập",ne:"पढाइको सामग्री",si:"ඉගෙනීමේ අන්තර්ගතය",en:"learning content",my:"သင်ယူရမည့် အကြောင်းအရာ",mn:"сургалтын агуулга"},
+{kanji:"容易",reading:"ようい",jp:"簡単でしやすいこと。",zh:"容易",vi:"dễ dàng",ne:"सहज; सजिलो",si:"පහසු",en:"easy",my:"လွယ်ကူသော",mn:"хялбар"},
+{kanji:"必要",reading:"ひつよう",jp:"なくてはならないこと。",zh:"必要",vi:"cần thiết",ne:"आवश्यक",si:"අවශ්‍ය",en:"necessary",my:"လိုအပ်သော",mn:"шаардлагатай"},
+{kanji:"効果的",reading:"こうかてき",jp:"よい結果がしっかり出るようす。",zh:"有效的",vi:"hiệu quả",ne:"प्रभावकारी",si:"ඵලදායී",en:"effective",my:"ထိရောက်သော",mn:"үр дүнтэй"},
+{kanji:"視力低下",reading:"しりょくていか",jp:"目が見えにくくなること。",zh:"视力下降",vi:"suy giảm thị lực",ne:"दृष्टि कमजोर हुनु",si:"ඇස් පෙනීම අඩුවීම",en:"decline in eyesight",my:"မျက်စိအမြင်အာရုံ ကျဆင်းခြင်း",mn:"хараа муудах"},
+{kanji:"教育委員会",reading:"きょういくいいんかい",jp:"地域の教育について決める役所。",zh:"教育委员会",vi:"ủy ban giáo dục",ne:"शिक्षा समिति",si:"අධ්‍යාපන මණ්ඩලය",en:"board of education",my:"ပညာရေးဘုတ်အဖွဲ့",mn:"боловсролын зөвлөл"},
+{kanji:"負担軽減",reading:"ふたんけいげん",jp:"大変さや重さを少なくすること。",zh:"减轻负担",vi:"giảm gánh nặng",ne:"भार कम गर्नु",si:"බර අඩු කිරීම",en:"burden reduction",my:"ဝန်ထုပ်ဝန်ပိုး လျှော့ချခြင်း",mn:"ачааллыг бууруулах"},
+{kanji:"政府",reading:"せいふ",jp:"国を動かすしくみや組織。",zh:"政府",vi:"chính phủ",ne:"सरकार",si:"රජය",en:"government",my:"အစိုးရ",mn:"засгийн газар"},
+{kanji:"閣議決定",reading:"かくぎけってい",jp:"大臣たちの会議で正式に決めること。",zh:"内阁会议决定",vi:"quyết định của nội các",ne:"मन्त्रिपरिषद्को निर्णय",si:"මන්ත්‍රි මණ්ඩල තීරණය",en:"cabinet decision",my:"အစိုးရအဖွဲ့၏ ဆုံးဖြတ်ချက်",mn:"Засгийн газрын шийдвэр"},
+{kanji:"学校教育法改正案",reading:"がっこうきょういくほうかいせいあん",jp:"学校教育法を変えるための案。",zh:"学校教育法修正案",vi:"dự thảo sửa đổi Luật Giáo dục Trường học",ne:"विद्यालय शिक्षा ऐन संशोधन प्रस्ताव",si:"පාසල් අධ්‍යාපන නීති සංශෝධන කෙටුම්පත",en:"bill to amend the School Education Act",my:"ကျောင်းပညာရေးဥပဒေ ပြင်ဆင်ရေး ဥပဒေကြမ်း",mn:"Сургуулийн боловсролын тухай хуульд нэмэлт өөрчлөлт оруулах хуулийн төсөл"},
+{kanji:"国会",reading:"こっかい",jp:"国の法律を決める場所。",zh:"国会",vi:"quốc hội",ne:"संसद",si:"පාර්ලිමේන්තුව",en:"National Diet; parliament",my:"ဂျပန်လွှတ်တော်; ပါလီမန်",mn:"парламент; Японы парламент"},
+{kanji:"ハイブリッド",reading:"はいぶりっど",jp:"二つ以上を組み合わせた形。",zh:"混合型，混合",vi:"lai, kết hợp",ne:"मिश्रित रूप",si:"මිශ්‍ර ආකාරය",en:"hybrid",my:"ပေါင်းစပ်ထားသော ပုံစံ",mn:"хосолсон хэлбэр"},
+{kanji:"順次",reading:"じゅんじ",jp:"順番に少しずつ進めること。",zh:"依次，陆续",vi:"lần lượt, theo thứ tự",ne:"क्रमशः",si:"क्रमයෙන්",en:"sequentially; gradually",my:"အစဉ်လိုက်; တဖြည်းဖြည်း",mn:"дарааллаар; аажмаар"},
 ];
 
 const tabBtns=document.querySelectorAll('.tabBtn'); const panels=document.querySelectorAll('.panel');
 tabBtns.forEach(btn=>btn.addEventListener('click',()=>{tabBtns.forEach(b=>b.classList.remove('active'));btn.classList.add('active');panels.forEach(p=>p.classList.add('hidden'));const target=document.getElementById(btn.dataset.target);target.classList.remove('hidden');target.scrollIntoView({behavior:'smooth',block:'start'});}));
 
 const vocabGrid=document.getElementById('vocabGrid');
-function renderVocab(list){vocabGrid.innerHTML=''; list.forEach((w,i)=>{const div=document.createElement('div'); div.className='vocabItem'; div.innerHTML=`<button class="vocabHeader" type="button"><span>${i+1}. ${w.kanji}</span><span>タップでひらく</span></button><div class="vocabBody"><div class="meaningBlock"><div class="meaningLabel">読み</div><div>${w.reading}</div></div><div class="meaningBlock"><div class="meaningLabel">やさしい日本語</div><div>${w.jp}</div></div><div class="meaningBlock"><div class="meaningLabel">中国語</div><div>${w.zh}</div></div><div class="meaningBlock"><div class="meaningLabel">ベトナム語</div><div>${w.vi}</div></div><div class="meaningBlock"><div class="meaningLabel">ネパール語</div><div>${w.ne}</div></div><div class="meaningBlock"><div class="meaningLabel">シンハラ語</div><div>${w.si}</div></div><div class="meaningBlock"><div class="meaningLabel">英語</div><div>${w.en}</div></div></div>`; div.querySelector('.vocabHeader').addEventListener('click',()=>div.classList.toggle('open')); vocabGrid.appendChild(div);});}
+const languageSelect=document.getElementById('languageSelect');
+const LANGUAGES={
+  zh:{label:'中国語',lang:'zh'},
+  vi:{label:'ベトナム語',lang:'vi'},
+  ne:{label:'ネパール語',lang:'ne'},
+  si:{label:'シンハラ語',lang:'si'},
+  my:{label:'ミャンマー語',lang:'my'},
+  mn:{label:'モンゴル語',lang:'mn'},
+  en:{label:'英語',lang:'en'}
+};
+const LANGUAGE_KEYS=Object.keys(LANGUAGES);
+function loadLanguage(){
+  try{
+    const saved=localStorage.getItem('kanjiQuizTranslationLanguage');
+    return [...LANGUAGE_KEYS,'all'].includes(saved)?saved:'en';
+  }catch(e){return 'en'}
+}
+function saveLanguage(lang){
+  try{localStorage.setItem('kanjiQuizTranslationLanguage',lang)}catch(e){}
+}
+let selectedLanguage=loadLanguage();
+languageSelect.value=selectedLanguage;
+
+function translationHtml(w){
+  const block=(key)=>{
+    const info=LANGUAGES[key];
+    return `<div class="meaningBlock"><div class="meaningLabel">${info.label}</div><div lang="${info.lang}">${w[key]}</div></div>`;
+  };
+  return selectedLanguage==='all'
+    ? LANGUAGE_KEYS.map(block).join('')
+    : block(selectedLanguage);
+}
+function getFilteredWords(){
+  const q=document.getElementById('searchInput').value.trim().toLowerCase();
+  return q?WORDS.filter(w=>Object.values(w).some(v=>String(v).toLowerCase().includes(q))):WORDS;
+}
+function renderVocab(list){
+  vocabGrid.innerHTML='';
+  list.forEach((w,i)=>{
+    const div=document.createElement('div');
+    div.className='vocabItem';
+    div.innerHTML=`<button class="vocabHeader" type="button"><span>${i+1}. ${w.kanji}</span><span>タップでひらく</span></button><div class="vocabBody"><div class="meaningBlock"><div class="meaningLabel">読み</div><div>${w.reading}</div></div><div class="meaningBlock"><div class="meaningLabel">やさしい日本語</div><div>${w.jp}</div></div>${translationHtml(w)}</div>`;
+    div.querySelector('.vocabHeader').addEventListener('click',()=>div.classList.toggle('open'));
+    vocabGrid.appendChild(div);
+  });
+}
 renderVocab(WORDS);
-document.getElementById('searchInput').addEventListener('input',e=>{const q=e.target.value.trim().toLowerCase(); const filtered=WORDS.filter(w=>Object.values(w).some(v=>String(v).toLowerCase().includes(q))); renderVocab(filtered);});
+languageSelect.addEventListener('change',()=>{
+  selectedLanguage=languageSelect.value;
+  saveLanguage(selectedLanguage);
+  renderVocab(getFilteredWords());
+});
+document.getElementById('searchInput').addEventListener('input',()=>renderVocab(getFilteredWords()));
 document.getElementById('openAllBtn').addEventListener('click',()=>document.querySelectorAll('.vocabItem').forEach(x=>x.classList.add('open')));
 document.getElementById('closeAllBtn').addEventListener('click',()=>document.querySelectorAll('.vocabItem').forEach(x=>x.classList.remove('open')));
 
